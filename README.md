@@ -1,26 +1,20 @@
-# 📚 INDIEC API - Documentación de Endpoints
+# PetPocket Backend API Documentation
 
-## 🌐 Información General
+## Información General
 
-- **Base URL**: `http://localhost:3000/api`
-- **Formato de respuesta**: JSON
+- **Base URL**: `http://localhost:3001/api`
 - **Autenticación**: JWT Bearer Token
-- **CORS**: Configurado para `http://localhost:5173`
+- **Formato de respuesta**: JSON
+- **Rate Limit**: 100 requests por 15 minutos
 
-## 📋 Estructura de Respuestas
+## Estructura de Respuestas
 
 ### Respuesta Exitosa
 \`\`\`json
 {
   "success": true,
-  "message": "Operación exitosa",
   "data": {},
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 100,
-    "pages": 10
-  }
+  "message": "Mensaje descriptivo"
 }
 \`\`\`
 
@@ -28,32 +22,28 @@
 \`\`\`json
 {
   "success": false,
-  "message": "Descripción del error",
-  "errors": [
-    {
-      "field": "email",
-      "message": "El email es requerido"
-    }
-  ]
+  "error": "Mensaje de error",
+  "code": "ERROR_CODE"
 }
 \`\`\`
 
----
-
-## 🔐 AUTENTICACIÓN
+## Autenticación
 
 ### 1. Registro de Usuario
 **POST** `/auth/register`
 
+**Headers:**
+\`\`\`
+Content-Type: application/json
+\`\`\`
+
 **Body:**
 \`\`\`json
 {
-  "email": "usuario@ejemplo.com",
+  "name": "Juan Pérez",
+  "email": "juan@example.com",
   "password": "123456",
-  "nombres": "Juan Carlos",
-  "apellidos": "Pérez García",
-  "genero": "Masculino",
-  "fecha": "1990-05-15"
+  "role": "Veterinario"
 }
 \`\`\`
 
@@ -61,30 +51,26 @@
 \`\`\`json
 {
   "success": true,
-  "message": "Usuario registrado exitosamente",
   "data": {
-    "id": 1,
-    "email": "usuario@ejemplo.com",
-    "nombres": "Juan Carlos",
-    "apellidos": "Pérez García"
-  }
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "name": "Juan Pérez",
+      "email": "juan@example.com",
+      "role": "Veterinario"
+    }
+  },
+  "message": "Usuario registrado exitosamente"
 }
 \`\`\`
 
-**Códigos de Estado:**
-- `201`: Usuario creado exitosamente
-- `409`: Email ya registrado
-- `400`: Datos inválidos
-
----
-
-### 2. Login de Usuario
+### 2. Iniciar Sesión
 **POST** `/auth/login`
 
 **Body:**
 \`\`\`json
 {
-  "email": "usuario@ejemplo.com",
+  "email": "juan@example.com",
   "password": "123456"
 }
 \`\`\`
@@ -93,747 +79,383 @@
 \`\`\`json
 {
   "success": true,
-  "message": "Login exitoso",
   "data": {
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "user": {
       "id": 1,
-      "email": "usuario@ejemplo.com",
-      "nombres": "Juan Carlos",
-      "apellidos": "Pérez García",
-      "genero": "Masculino",
-      "fecha": "1990-05-15"
+      "name": "Juan Pérez",
+      "email": "juan@example.com",
+      "role": "Veterinario"
     }
-  }
+  },
+  "message": "Login exitoso"
 }
 \`\`\`
 
-**Códigos de Estado:**
-- `200`: Login exitoso
-- `401`: Credenciales inválidas
-- `401`: Usuario inactivo
+## Usuarios (Solo Administradores)
 
----
-
-## 👤 USUARIOS
-
-### 3. Obtener Perfil
-**GET** `/users/profile`
+### 3. Obtener Todos los Usuarios
+**GET** `/users`
 
 **Headers:**
 \`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Authorization: Bearer {token}
 \`\`\`
 
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "email": "usuario@ejemplo.com",
-    "nombres": "Juan Carlos",
-    "apellidos": "Pérez García",
-    "genero": "Masculino",
-    "fecha": "1990-05-15",
-    "estado": true,
-    "created_at": "2024-01-15T10:30:00.000Z",
-    "updated_at": "2024-01-15T10:30:00.000Z",
-    "details": {
-      "foto": "/uploads/1642234567890-abc123.jpg",
-      "telefono": "+57 300 123 4567",
-      "ubicacion": "Bogotá, Colombia",
-      "bio": "Músico apasionado por el rock alternativo"
-    }
-  }
-}
-\`\`\`
+**Query Parameters:**
+- `page` (opcional): Número de página (default: 1)
+- `limit` (opcional): Elementos por página (default: 10)
 
----
-
-### 4. Actualizar Perfil
-**PUT** `/users/profile`
+### 4. Crear Usuario
+**POST** `/users`
 
 **Headers:**
 \`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Authorization: Bearer {token}
+Content-Type: application/json
 \`\`\`
 
 **Body:**
 \`\`\`json
 {
-  "nombres": "Juan Carlos",
-  "apellidos": "Pérez García",
-  "genero": "Masculino",
-  "telefono": "+57 300 123 4567",
-  "ubicacion": "Bogotá, Colombia",
-  "bio": "Músico apasionado por el rock alternativo"
+  "name": "María García",
+  "email": "maria@example.com",
+  "password": "123456",
+  "role": "Recepcionista"
 }
 \`\`\`
 
-**Respuesta:**
+### 5. Actualizar Usuario
+**PUT** `/users/{id}`
+
+**Body:**
 \`\`\`json
 {
-  "success": true,
-  "message": "Perfil actualizado exitosamente"
+  "name": "María García Actualizada",
+  "email": "maria.nueva@example.com",
+  "role": "Veterinario"
 }
 \`\`\`
 
----
+### 6. Eliminar Usuario
+**DELETE** `/users/{id}`
 
-### 5. Subir Foto de Perfil
-**POST** `/users/profile/photo`
+## Propietarios
 
-**Headers:**
+### 7. Obtener Todos los Propietarios
+**GET** `/owners`
+
+**Query Parameters:**
+- `page` (opcional): Número de página
+- `limit` (opcional): Elementos por página
+- `search` (opcional): Buscar por nombre, email o teléfono
+
+**Ejemplo:**
 \`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: multipart/form-data
+GET /owners?page=1&limit=5&search=juan
 \`\`\`
 
-**Body (Form Data):**
-\`\`\`
-photo: [archivo de imagen]
-\`\`\`
+### 8. Crear Propietario
+**POST** `/owners`
 
-**Respuesta:**
+**Body:**
 \`\`\`json
 {
-  "success": true,
-  "message": "Foto de perfil actualizada exitosamente",
-  "data": {
-    "photoPath": "/uploads/1642234567890-abc123.jpg"
-  }
+  "name": "Carlos Rodríguez",
+  "email": "carlos@example.com",
+  "phone": "+1234567890"
 }
 \`\`\`
 
----
+### 9. Actualizar Propietario
+**PUT** `/owners/{id}`
 
-## 🎵 MÚSICA
-
-### 6. Listar Canciones
-**GET** `/music?page=1&limit=10`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
-
-**Respuesta:**
+**Body:**
 \`\`\`json
 {
-  "success": true,
-  "data": [
+  "name": "Carlos Rodríguez Actualizado",
+  "phone": "+0987654321"
+}
+\`\`\`
+
+### 10. Eliminar Propietario
+**DELETE** `/owners/{id}`
+
+### 11. Obtener Mascotas de un Propietario
+**GET** `/owners/{id}/pets`
+
+## Mascotas
+
+### 12. Obtener Todas las Mascotas
+**GET** `/pets`
+
+**Query Parameters:**
+- `page`, `limit`, `search` (como en owners)
+- `owner_id` (opcional): Filtrar por propietario
+
+### 13. Crear Mascota
+**POST** `/pets`
+
+**Body:**
+\`\`\`json
+{
+  "name": "Max",
+  "breed": "Golden Retriever",
+  "age": 3,
+  "owner_id": 1,
+  "health_status": "Saludable"
+}
+\`\`\`
+
+### 14. Actualizar Mascota
+**PUT** `/pets/{id}`
+
+### 15. Eliminar Mascota
+**DELETE** `/pets/{id}`
+
+### 16. Obtener Historial Médico
+**GET** `/pets/{id}/medical-history`
+
+### 17. Agregar Registro Médico
+**POST** `/pets/{id}/medical-history`
+
+**Body:**
+\`\`\`json
+{
+  "diagnosis": "Infección de oído",
+  "treatment": "Antibióticos por 7 días",
+  "observations": "Revisar en una semana"
+}
+\`\`\`
+
+## Servicios
+
+### 18. Obtener Todos los Servicios
+**GET** `/services`
+
+**Query Parameters:**
+- `active` (opcional): true/false
+- `search` (opcional): Buscar por nombre o descripción
+
+### 19. Crear Servicio (Solo Administradores)
+**POST** `/services`
+
+**Body:**
+\`\`\`json
+{
+  "name": "Consulta General",
+  "description": "Consulta veterinaria general",
+  "image": "https://example.com/image.jpg",
+  "subcategories": [
     {
-      "id": 1,
-      "titulo": "Bohemian Rhapsody",
-      "album": "A Night at the Opera",
-      "duracion": "5:55",
-      "año": 1975,
-      "genero": "Rock",
-      "estado": "Activo",
-      "user_id": 1,
-      "created_at": "2024-01-15T10:30:00.000Z",
-      "updated_at": "2024-01-15T10:30:00.000Z",
-      "details": {
-        "foto": "/uploads/music-1642234567890.jpg",
-        "descripcion": "Una obra maestra del rock progresivo",
-        "lyrics": "Is this the real life? Is this just fantasy?..."
-      }
+      "id": "consulta-basica",
+      "name": "Consulta Básica",
+      "price": 50.00
+    },
+    {
+      "id": "consulta-especializada",
+      "name": "Consulta Especializada",
+      "price": 80.00
     }
   ],
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 25,
-    "pages": 3
-  }
+  "active": true
 }
 \`\`\`
 
----
+### 20. Actualizar Servicio
+**PUT** `/services/{id}`
 
-### 7. Crear Canción
-**POST** `/music`
+### 21. Eliminar Servicio
+**DELETE** `/services/{id}`
 
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
+## Productos
+
+### 22. Obtener Todos los Productos
+**GET** `/products`
+
+**Query Parameters:**
+- `category` (opcional): Filtrar por categoría
+- `active` (opcional): true/false
+
+### 23. Crear Producto (Solo Administradores)
+**POST** `/products`
 
 **Body:**
 \`\`\`json
 {
-  "titulo": "Stairway to Heaven",
-  "album": "Led Zeppelin IV",
-  "duracion": "8:02",
-  "año": 1971,
-  "genero": "Rock"
+  "name": "Alimento Premium para Perros",
+  "description": "Alimento balanceado para perros adultos",
+  "price": 25.99,
+  "stock": 100,
+  "category": "Alimentos",
+  "image": "https://example.com/product.jpg",
+  "active": true
 }
 \`\`\`
 
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "message": "Canción creada exitosamente",
-  "data": {
-    "id": 2,
-    "titulo": "Stairway to Heaven",
-    "album": "Led Zeppelin IV",
-    "duracion": "8:02",
-    "año": 1971,
-    "genero": "Rock",
-    "estado": "Activo",
-    "user_id": 1,
-    "created_at": "2024-01-15T11:00:00.000Z",
-    "updated_at": "2024-01-15T11:00:00.000Z"
-  }
-}
-\`\`\`
+### 24. Actualizar Producto
+**PUT** `/products/{id}`
 
----
+### 25. Eliminar Producto
+**DELETE** `/products/{id}`
 
-### 8. Obtener Canción por ID
-**GET** `/music/1`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "data": {
-    "id": 1,
-    "titulo": "Bohemian Rhapsody",
-    "album": "A Night at the Opera",
-    "duracion": "5:55",
-    "año": 1975,
-    "genero": "Rock",
-    "estado": "Activo",
-    "user_id": 1,
-    "created_at": "2024-01-15T10:30:00.000Z",
-    "updated_at": "2024-01-15T10:30:00.000Z",
-    "details": {
-      "foto": "/uploads/music-1642234567890.jpg",
-      "descripcion": "Una obra maestra del rock progresivo",
-      "lyrics": "Is this the real life? Is this just fantasy?..."
-    }
-  }
-}
-\`\`\`
-
----
-
-### 9. Actualizar Canción
-**PUT** `/music/1`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
+### 26. Actualizar Stock
+**PATCH** `/products/{id}/stock`
 
 **Body:**
 \`\`\`json
 {
-  "titulo": "Bohemian Rhapsody (Remastered)",
-  "album": "A Night at the Opera",
-  "duracion": "5:55",
-  "año": 1975,
-  "genero": "Rock"
+  "quantity": 10,
+  "operation": "add"
 }
 \`\`\`
 
-**Respuesta:**
+## Órdenes
+
+### 27. Obtener Todas las Órdenes
+**GET** `/orders`
+
+**Query Parameters:**
+- `status` (opcional): Cumplido, En Progreso, No Cumplido
+- `payment_status` (opcional): Pagado, Pendiente, No Pagado
+
+### 28. Crear Orden
+**POST** `/orders`
+
+**Body:**
 \`\`\`json
 {
-  "success": true,
-  "message": "Canción actualizada exitosamente"
-}
-\`\`\`
-
----
-
-### 10. Eliminar Canción
-**DELETE** `/music/1`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "message": "Canción eliminada exitosamente"
-}
-\`\`\`
-
----
-
-### 11. Subir Imagen de Canción
-**POST** `/music/1/photo`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-Content-Type: multipart/form-data
-\`\`\`
-
-**Body (Form Data):**
-\`\`\`
-photo: [archivo de imagen]
-\`\`\`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "message": "Imagen actualizada exitosamente",
-  "data": {
-    "photoPath": "/uploads/music-1642234567890.jpg"
-  }
-}
-\`\`\`
-
----
-
-## 💿 ÁLBUMES
-
-### 12. Listar Álbumes
-**GET** `/albums?page=1&limit=10`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "data": [
+  "client_id": 1,
+  "products": [
     {
-      "id": 1,
-      "titulo": "The Dark Side of the Moon",
-      "artista": "Pink Floyd",
-      "año": 1973,
-      "genero": "Rock",
-      "activo": true,
-      "user_id": 1,
-      "created_at": "2024-01-15T10:30:00.000Z",
-      "updated_at": "2024-01-15T10:30:00.000Z",
-      "details": {
-        "foto": "/uploads/album-1642234567890.jpg",
-        "descripcion": "Álbum conceptual sobre la experiencia humana"
-      }
+      "productId": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "quantity": 2
+    },
+    {
+      "productId": "64f8a1b2c3d4e5f6a7b8c9d1",
+      "quantity": 1
     }
   ],
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 15,
-    "pages": 2
-  }
+  "notes": "Entrega urgente",
+  "payment_status": "Pendiente"
 }
 \`\`\`
 
----
-
-### 13. Crear Álbum
-**POST** `/albums`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
+### 29. Actualizar Orden
+**PUT** `/orders/{id}`
 
 **Body:**
 \`\`\`json
 {
-  "titulo": "Abbey Road",
-  "artista": "The Beatles",
-  "año": 1969,
-  "genero": "Rock"
+  "payment_status": "Pagado",
+  "fulfillment_status": "Cumplido",
+  "notes": "Orden completada satisfactoriamente"
 }
 \`\`\`
 
-**Respuesta:**
+### 30. Obtener Detalles de Orden
+**GET** `/orders/{id}/details`
+
+## Citas
+
+### 31. Obtener Todas las Citas
+**GET** `/appointments`
+
+**Query Parameters:**
+- `status` (opcional): Pendiente, Completada, Cancelada
+- `date` (opcional): YYYY-MM-DD
+- `client_id` (opcional): ID del cliente
+
+### 32. Crear Cita
+**POST** `/appointments`
+
+**Body:**
 \`\`\`json
 {
-  "success": true,
-  "message": "Álbum creado exitosamente",
-  "data": {
-    "id": 2,
-    "titulo": "Abbey Road",
-    "artista": "The Beatles",
-    "año": 1969,
-    "genero": "Rock",
-    "activo": true,
-    "user_id": 1,
-    "created_at": "2024-01-15T11:00:00.000Z",
-    "updated_at": "2024-01-15T11:00:00.000Z"
-  }
-}
-\`\`\`
-
----
-
-### 14. Obtener Álbum por ID
-**GET** `/albums/1`
-
-### 15. Actualizar Álbum
-**PUT** `/albums/1`
-
-### 16. Eliminar Álbum
-**DELETE** `/albums/1`
-
-### 17. Subir Imagen de Álbum
-**POST** `/albums/1/photo`
-
----
-
-## 👥 GRUPOS MUSICALES
-
-### 18. Listar Grupos
-**GET** `/groups?page=1&limit=10`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "data": [
+  "client_id": 1,
+  "pet_id": 1,
+  "appointment_date": "2024-01-15T10:00:00Z",
+  "services": [
     {
-      "id": 1,
-      "nombre_grupo": "Los Rockeros",
-      "genero_musical": "Rock Alternativo",
-      "activo": true,
-      "user_id": 1,
-      "created_at": "2024-01-15T10:30:00.000Z",
-      "updated_at": "2024-01-15T10:30:00.000Z",
-      "details": {
-        "foto": "/uploads/group-1642234567890.jpg",
-        "descripcion": "Banda de rock alternativo formada en 2020",
-        "miembros": ["Juan - Guitarra", "Pedro - Batería", "Ana - Bajo"]
-      }
+      "serviceId": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "subcategoryId": "consulta-basica"
     }
   ],
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 8,
-    "pages": 1
-  }
+  "notes": "Primera consulta",
+  "payment_status": "No Pagado"
 }
 \`\`\`
 
----
-
-### 19. Crear Grupo
-**POST** `/groups`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
+### 33. Actualizar Cita
+**PUT** `/appointments/{id}`
 
 **Body:**
 \`\`\`json
 {
-  "nombre_grupo": "Metal Warriors",
-  "genero_musical": "Heavy Metal"
+  "status": "Completada",
+  "payment_status": "Pagado",
+  "diagnosis": "Mascota en buen estado",
+  "treatment": "Vacunación al día",
+  "followUp": {
+    "required": true,
+    "date": "2024-02-15T10:00:00Z",
+    "notes": "Revisar vacunas"
+  }
 }
 \`\`\`
+
+### 34. Obtener Detalles de Cita
+**GET** `/appointments/{id}/details`
+
+## Estadísticas (Administradores y Veterinarios)
+
+### 35. Obtener Estadísticas Generales
+**GET** `/stats`
 
 **Respuesta:**
 \`\`\`json
 {
   "success": true,
-  "message": "Grupo creado exitosamente",
   "data": {
-    "id": 2,
-    "nombre_grupo": "Metal Warriors",
-    "genero_musical": "Heavy Metal",
-    "activo": true,
-    "user_id": 1,
-    "created_at": "2024-01-15T11:00:00.000Z",
-    "updated_at": "2024-01-15T11:00:00.000Z"
-  }
+    "users": 5,
+    "owners": 25,
+    "pets": 40,
+    "orders": 15,
+    "appointments": 30,
+    "products": 20,
+    "services": 8
+  },
+  "message": "Estadísticas obtenidas exitosamente"
 }
 \`\`\`
 
----
+## Códigos de Error Comunes
 
-### 20. Obtener Grupo por ID
-**GET** `/groups/1`
+- `TOKEN_REQUIRED`: Token de acceso requerido
+- `INVALID_TOKEN`: Token inválido o expirado
+- `INSUFFICIENT_PERMISSIONS`: Permisos insuficientes
+- `VALIDATION_ERROR`: Datos de entrada inválidos
+- `NOT_FOUND`: Recurso no encontrado
+- `EMAIL_EXISTS`: Email ya registrado
+- `INSUFFICIENT_STOCK`: Stock insuficiente
+- `RATE_LIMIT_EXCEEDED`: Límite de peticiones excedido
 
-### 21. Actualizar Grupo
-**PUT** `/groups/1`
+## Roles y Permisos
 
-### 22. Eliminar Grupo
-**DELETE** `/groups/1`
+### Administrador
+- Acceso completo a todas las funcionalidades
+- Gestión de usuarios, servicios y productos
+- Acceso a estadísticas y reportes
 
-### 23. Subir Imagen de Grupo
-**POST** `/groups/1/photo`
+### Veterinario
+- Gestión de propietarios, mascotas y citas
+- Agregar registros médicos
+- Acceso a estadísticas
 
----
-
-## 🎪 EVENTOS
-
-### 24. Listar Eventos
-**GET** `/events?page=1&limit=10`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "nombre_evento": "Festival de Rock 2024",
-      "genero_musical": "Rock",
-      "fecha": "2024-06-15",
-      "contacto": "eventos@rockfest.com",
-      "capacidad": 5000,
-      "estado": true,
-      "user_id": 1,
-      "created_at": "2024-01-15T10:30:00.000Z",
-      "updated_at": "2024-01-15T10:30:00.000Z",
-      "details": {
-        "foto": "/uploads/event-1642234567890.jpg",
-        "descripcion": "El festival de rock más grande del año",
-        "ubicacion_detallada": "Parque Simón Bolívar, Bogotá",
-        "precio": 150000
-      }
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "limit": 10,
-    "total": 12,
-    "pages": 2
-  }
-}
+### Recepcionista
+- Gestión de propietarios, mascotas, citas y órdenes
+- Actualización de stock de productos
+- Sin acceso a gestión de usuarios
 \`\`\`
 
----
-
-### 25. Crear Evento
-**POST** `/events`
-
-**Headers:**
-\`\`\`
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-\`\`\`
-
-**Body:**
-\`\`\`json
-{
-  "nombre_evento": "Concierto de Jazz",
-  "genero_musical": "Jazz",
-  "fecha": "2024-07-20",
-  "contacto": "info@jazznight.com",
-  "capacidad": 300
-}
-\`\`\`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "message": "Evento creado exitosamente",
-  "data": {
-    "id": 2,
-    "nombre_evento": "Concierto de Jazz",
-    "genero_musical": "Jazz",
-    "fecha": "2024-07-20",
-    "contacto": "info@jazznight.com",
-    "capacidad": 300,
-    "estado": true,
-    "user_id": 1,
-    "created_at": "2024-01-15T11:00:00.000Z",
-    "updated_at": "2024-01-15T11:00:00.000Z"
-  }
-}
-\`\`\`
-
----
-
-### 26. Obtener Evento por ID
-**GET** `/events/1`
-
-### 27. Actualizar Evento
-**PUT** `/events/1`
-
-### 28. Eliminar Evento
-**DELETE** `/events/1`
-
-### 29. Subir Imagen de Evento
-**POST** `/events/1/photo`
-
----
-
-## 🔍 ENDPOINT DE SALUD
-
-### 30. Verificar Estado de la API
-**GET** `/health`
-
-**Respuesta:**
-\`\`\`json
-{
-  "success": true,
-  "message": "INDIEC API funcionando correctamente",
-  "timestamp": "2024-01-15T11:30:00.000Z"
-}
-\`\`\`
-
----
-
-## 📝 VALIDACIONES
-
-### Géneros Musicales Válidos
-- Rock
-- Pop
-- Jazz
-- Clásica
-- Electrónica
-- Hip-Hop
-- Reggae
-- Metal
-
-### Géneros de Usuario Válidos
-- Masculino
-- Femenino
-- Otro
-
-### Formato de Duración
-- Formato: `MM:SS` (ejemplo: `3:45`, `10:30`)
-
-### Tipos de Archivo Permitidos
-- Imágenes: JPG, JPEG, PNG, GIF
-- Tamaño máximo: 5MB
-
----
-
-## ⚠️ CÓDIGOS DE ERROR COMUNES
-
-- `400`: Datos de entrada inválidos
-- `401`: No autorizado (token faltante o inválido)
-- `403`: Token expirado
-- `404`: Recurso no encontrado
-- `409`: Recurso ya existe (email duplicado)
-- `429`: Demasiadas peticiones (rate limit)
-- `500`: Error interno del servidor
-
----
-
-## 🧪 EJEMPLOS DE PRUEBA CON CURL
-
-### Registro
-\`\`\`bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@ejemplo.com",
-    "password": "123456",
-    "nombres": "Usuario",
-    "apellidos": "Prueba",
-    "genero": "Masculino",
-    "fecha": "1990-01-01"
-  }'
-\`\`\`
-
-### Login
-\`\`\`bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@ejemplo.com",
-    "password": "123456"
-  }'
-\`\`\`
-
-### Crear Canción
-\`\`\`bash
-curl -X POST http://localhost:3000/api/music \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer TU_TOKEN_AQUI" \
-  -d '{
-    "titulo": "Mi Canción",
-    "album": "Mi Álbum",
-    "duracion": "3:45",
-    "año": 2024,
-    "genero": "Rock"
-  }'
-\`\`\`
-
-### Subir Imagen
-\`\`\`bash
-curl -X POST http://localhost:3000/api/music/1/photo \
-  -H "Authorization: Bearer TU_TOKEN_AQUI" \
-  -F "photo=@/ruta/a/tu/imagen.jpg"
-\`\`\`
-
----
-
-## 📊 COLECCIÓN DE POSTMAN
-
-Para facilitar las pruebas, puedes importar esta colección en Postman:
-
-1. Crear nueva colección llamada "INDIEC API"
-2. Configurar variable de entorno `baseUrl` = `http://localhost:3000/api`
-3. Configurar variable de entorno `token` para almacenar el JWT
-4. Agregar todos los endpoints listados arriba
-
----
-
-## 🔧 CONFIGURACIÓN DE DESARROLLO
-
-### Variables de Entorno Requeridas
-\`\`\`env
-PORT=3000
-NODE_ENV=development
-MYSQL_HOST=localhost
-MYSQL_USER=root
-MYSQL_PASSWORD=password
-MYSQL_DATABASE=indiec_db
-MONGODB_URI=mongodb://localhost:27017/indiec_mongo
-JWT_SECRET=indiec_super_secret_jwt_key_2024
-JWT_EXPIRES_IN=24h
-ENCRYPTION_KEY=indiec_32_char_encryption_key_123
-UPLOAD_PATH=./uploads
-MAX_FILE_SIZE=5242880
-LOG_LEVEL=info
-\`\`\`
-
-### Comandos Útiles
-\`\`\`bash
-# Instalar dependencias
-npm install
-
-# Ejecutar en desarrollo
-npm run dev
-
-# Ejecutar en producción
-npm start
-
-# Ver logs en tiempo real
-tail -f logs/api.log
-\`\`\`
-
----
-
-¡La API INDIEC está lista para usar! 🎵🚀
+Ahora creo una colección completa de Postman:
