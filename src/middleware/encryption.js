@@ -1,4 +1,5 @@
 const { encrypt, decrypt } = require("../utils/encryption")
+const config = require("../../key")
 
 const encryptFields = (fields) => {
   return (req, res, next) => {

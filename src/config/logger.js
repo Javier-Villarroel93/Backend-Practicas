@@ -1,6 +1,7 @@
 const winston = require("winston");
 const path = require("path");
 const fs = require("fs");
+const config = require("../../key");
 
 // Crear directorio de logs si no existe
 const logDir = path.join(__dirname, "../../logs");
@@ -10,7 +11,7 @@ if (!fs.existsSync(logDir)) {
 }
 
 // Configuración de nivel de log desde variable de entorno
-const logLevel = process.env.LOG_LEVEL || "info";
+const logLevel = config.LOG_LEVEL || "info";
 
 // Formato personalizado para consola
 const consoleFormat = winston.format.combine(
@@ -36,7 +37,7 @@ const logger = winston.createLogger({
   level: logLevel,
   defaultMeta: { 
     service: 'petpocket-backend',
-    version: process.env.npm_package_version || '1.0.0'
+    version: config.npm_package_version || '1.0.0'
   },
   transports: [
     // Archivo único para todos los logs
@@ -49,7 +50,7 @@ const logger = winston.createLogger({
     }),
     
     // Consola solo en desarrollo
-    ...(process.env.NODE_ENV !== 'production' ? [
+    ...(config.NODE_ENV !== 'production' ? [
       new winston.transports.Console({
         format: consoleFormat,
         handleExceptions: true,
@@ -80,7 +81,7 @@ logger.warn = (message, meta = {}) => {
 logger.info("🚀 Logger inicializado", {
   level: logLevel,
   logDir: logDir,
-  nodeEnv: process.env.NODE_ENV
+  nodeEnv: config.NODE_ENV
 });
 
 module.exports = logger;

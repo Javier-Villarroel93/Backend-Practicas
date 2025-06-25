@@ -4,6 +4,7 @@ const User = require("../models/sql/User")
 const UserDetails = require("../models/mongodb/UserDetails")
 const { decryptFields } = require("../middleware/encryption")
 const logger = require("../config/logger")
+const config = require("../../key")
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -12,7 +13,7 @@ const generateToken = (user) => {
       email: decryptFields(user, ["encrypted_email"]).encrypted_email,
       role: user.role,
     },
-    process.env.JWT_SECRET,
+    config.JWT_SECRET,
     { expiresIn: "24h" },
   )
 }

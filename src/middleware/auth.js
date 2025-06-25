@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken")
 const logger = require("../config/logger")
+const config = require("../../key")
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"]
@@ -13,7 +14,7 @@ const authenticateToken = (req, res, next) => {
     })
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, config.JWT_SECRET, (err, user) => {
     if (err) {
       logger.warn(`Token inválido desde IP: ${req.ip}`)
       return res.status(403).json({

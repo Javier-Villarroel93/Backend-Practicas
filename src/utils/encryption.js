@@ -1,6 +1,7 @@
 const CryptoJS = require("crypto-js")
+const config = require("../../key")
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "default-key-change-in-production"
+const ENCRYPTION_KEY = config.ENCRYPTION_KEY || "default-key-change-in-production"
 
 const encrypt = (text) => {
   if (!text) return text

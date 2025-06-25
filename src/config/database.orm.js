@@ -2,11 +2,12 @@ const mongoose = require("mongoose")
 const logger = require("./logger")
 const fs = require("fs")
 const path = require("path")
+const config = require("../../key")
 
 const connectMongoDB = async () => {
   try {
     // Verificar que la URI de MongoDB esté configurada
-    if (!process.env.MONGODB_URI) {
+    if (!config.MONGODB_URI) {
       throw new Error("MONGODB_URI no está configurada en las variables de entorno")
     }
 
@@ -26,7 +27,7 @@ const connectMongoDB = async () => {
     mongoose.set('strictQuery', false)
     
     // Intentar conexión
-    await mongoose.connect(process.env.MONGODB_URI, mongoOptions)
+    await mongoose.connect(config.MONGODB_URI, mongoOptions)
     
     logger.info("✅ Conexión a MongoDB establecida correctamente")
     
@@ -49,7 +50,7 @@ const connectMongoDB = async () => {
     logger.error("❌ Error al conectar con MongoDB:", {
       error: error.message,
       code: error.code,
-      uri: process.env.MONGODB_URI ? "URI configurada" : "URI no configurada"
+      uri: config.MONGODB_URI ? "URI configurada" : "URI no configurada"
     })
     
     // Si es un error de conexión inicial, intentar crear la BD
