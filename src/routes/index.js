@@ -18,10 +18,11 @@ const router = express.Router()
 router.post("/auth/login", authController.loginValidation, authController.login)
 router.post(
   "/auth/register",
-  encryptFields(["name", "email"]),
-  authController.registerValidation,
-  authController.register,
+  authController.registerValidation,         // ✅ Primero validas en texto plano
+  encryptFields(["name", "email"]),          // 🔒 Luego encriptas
+  authController.register                    // 🚀 Luego ejecutas la lógica de registro
 )
+
 
 // Middleware de autenticación para todas las rutas siguientes
 router.use(authenticateToken)

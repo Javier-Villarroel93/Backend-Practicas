@@ -13,7 +13,7 @@ const generateToken = (user) => {
       email: decryptFields(user, ["encrypted_email"]).encrypted_email,
       role: user.role,
     },
-    config.JWT_SECRET,
+    config.JWT.SECRET,
     { expiresIn: "24h" },
   )
 }

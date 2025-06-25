@@ -14,7 +14,7 @@ const authenticateToken = (req, res, next) => {
     })
   }
 
-  jwt.verify(token, config.JWT_SECRET, (err, user) => {
+  jwt.verify(token, config.JWT.SECRET, (err, user) => {
     if (err) {
       logger.warn(`Token inválido desde IP: ${req.ip}`)
       return res.status(403).json({
