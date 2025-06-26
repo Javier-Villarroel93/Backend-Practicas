@@ -10,7 +10,7 @@ module.exports = {
     DATABASE: 'petpocket_sql',
   },
 
-  MONGODB_URI: 'mongodb://localhost:27017/petpocket_mongo',
+  MONGODB_URI: 'mongodb+srv://JavierVillarroel:1234567890@veterinaria.5onyg1t.mongodb.net/petpocket_mongo',
 
   JWT: {
     SECRET: 'tu_jwt_secret_muy_seguro_aqui',
@@ -20,5 +20,5 @@ module.exports = {
 
   FRONTEND_URL: 'http://localhost:3000',
 
-  NODE_ENV: 'development',
+  NODE_ENV: 'production',
 };
