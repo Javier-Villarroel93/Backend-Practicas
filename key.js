@@ -6,7 +6,7 @@ module.exports = {
   MYSQL: {
     HOST: 'localhost',
     USER: 'root',
-    PASSWORD: '',
+    PASSWORD: '12345',
     DATABASE: 'petpocket_sql',
   },
 

@@ -3,11 +3,11 @@ const logger = require("./logger")
 const config = require("../../key")
 
 const sequelize = new Sequelize(
-  config.MYSQL_DATABASE || "petpocket_sql",
-  config.MYSQL_USER || "root",
-  config.MYSQL_PASSWORD || "",
+  config.MYSQL.DATABASE || "petpocket_sql",
+  config.MYSQL.USER || "root",
+  config.MYSQL.PASSWORD || "",
   {
-    host: config.MYSQL_HOST || "localhost",
+    host: config.MYSQL.HOST || "localhost",
     dialect: "mysql",
     logging: (msg) => logger.info(msg),
     pool: {
